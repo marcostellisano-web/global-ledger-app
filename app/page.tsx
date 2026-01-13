@@ -72,7 +72,6 @@ export default async function Home() {
 
             <div className="mt-4 text-sm text-slate-500">
               Click &quot;Collect Now&quot; to manually gather articles from Reuters, BBC, AP News, FT, and other sources.
-              Articles are also collected automatically during the daily 6pm ET analysis.
             </div>
           </div>
 
@@ -177,7 +176,7 @@ export default async function Home() {
                   </button>
                 </form>
                 <p className="mt-4 text-sm text-slate-500">
-                  Analysis is automatically generated daily at 6pm ET.
+                  Generate your analysis anytime with one click.
                 </p>
               </div>
             </div>
