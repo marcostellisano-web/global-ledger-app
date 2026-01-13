@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const today = new Date().toISOString().split('T')[0];
+  const isKVConfigured = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
   const articleCount = await getTodayArticleCount();
   const todaySummary = await getSummaryByDate(today);
 
@@ -20,6 +21,28 @@ export default async function Home() {
             AI-Powered Macroeconomic & Geopolitical Investment Analysis
           </p>
         </header>
+
+        {/* Setup Warning */}
+        {!isKVConfigured && (
+          <div className="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <h2 className="text-lg font-semibold text-yellow-900 mb-2">
+              ⚠️ Setup Required
+            </h2>
+            <p className="text-yellow-800 mb-3">
+              Vercel KV storage is not configured. To enable article collection and analysis:
+            </p>
+            <ol className="list-decimal list-inside text-yellow-800 space-y-1 mb-3">
+              <li>Go to your Vercel project dashboard</li>
+              <li>Navigate to the Storage tab</li>
+              <li>Create a new KV database</li>
+              <li>The environment variables will be automatically added</li>
+              <li>Redeploy your application</li>
+            </ol>
+            <p className="text-sm text-yellow-700">
+              Without KV storage, the app cannot store articles or summaries.
+            </p>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="flex gap-4 mb-8">
