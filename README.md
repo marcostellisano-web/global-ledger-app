@@ -4,7 +4,7 @@ An AI-powered web application that aggregates macroeconomic and geopolitical new
 
 ## Features
 
-- **Automated News Collection**: Collects articles every 2 hours from multiple trusted sources (Reuters, BBC, AP News, Financial Times, Al Jazeera, The Guardian)
+- **Automated News Collection**: Collects articles daily at 6pm ET from multiple trusted sources (Reuters, BBC, AP News, Financial Times, Al Jazeera, The Guardian)
 - **AI-Powered Analysis**: Daily analysis at 6pm ET using Claude Sonnet 4 to identify key themes and investment opportunities
 - **Investment Ideas**: Generates specific, actionable trade ideas with tickers across equities, ETFs, commodities, and forex
 - **Searchable Archive**: Browse past analyses by date, search by ticker symbol, theme, or asset class
@@ -103,12 +103,16 @@ openssl rand -base64 32
 
 ### 4. Enable Cron Jobs
 
-Cron jobs are automatically configured in `vercel.json`:
+A cron job is automatically configured in `vercel.json`:
 
-- Article collection: Every 2 hours (`0 */2 * * *`)
-- Daily analysis: 10pm UTC / ~6pm ET (`0 22 * * *`)
+- Daily analysis at 10pm UTC / ~6pm ET (`0 22 * * *`)
+  - Collects fresh articles from all RSS feeds
+  - Analyzes articles with Claude AI
+  - Generates daily summary with themes and investment ideas
 
-These will be automatically enabled when you deploy.
+This will be automatically enabled when you deploy.
+
+**Note**: Vercel Hobby plan supports one daily cron job. The `/api/analyze` endpoint collects articles and performs analysis in a single operation. You can also manually collect articles or generate analysis anytime using the buttons in the UI.
 
 ## API Endpoints
 
@@ -235,18 +239,31 @@ Edit the `ANALYSIS_PROMPT` in `lib/claude/analyzer.ts` to customize how Claude a
 
 ### Changing Cron Schedule
 
-Edit `vercel.json` to adjust collection frequency or analysis time:
+Edit `vercel.json` to adjust the analysis time:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/analyze",
+      "schedule": "0 22 * * *"   // 10pm UTC (~6pm ET)
+    }
+  ]
+}
+```
+
+**Note**: Vercel Hobby plan only supports daily cron jobs (runs once per day). If you upgrade to Pro, you can add multiple cron jobs:
 
 ```json
 {
   "crons": [
     {
       "path": "/api/collect",
-      "schedule": "0 */2 * * *"  // Every 2 hours
+      "schedule": "0 */2 * * *"  // Collect articles every 2 hours (Pro only)
     },
     {
       "path": "/api/analyze",
-      "schedule": "0 22 * * *"   // 10pm UTC (~6pm ET)
+      "schedule": "0 22 * * *"   // Analyze at 6pm ET
     }
   ]
 }

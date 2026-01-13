@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getTodayArticles } from '@/lib/storage/kv';
+import { getTodayArticles, storeArticles } from '@/lib/storage/kv';
 import { analyzeArticles } from '@/lib/claude/analyzer';
 import { storeSummary, getSummaryByDate } from '@/lib/storage/kv';
+import { fetchAllFeeds, filterTodayArticles } from '@/lib/rss/parser';
 import { DailySummary } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -35,15 +36,27 @@ export async function POST(request: Request) {
       });
     }
 
-    // Get articles collected today
+    // First, collect fresh articles from RSS feeds
+    console.log('Collecting articles from RSS feeds...');
+    const allArticles = await fetchAllFeeds();
+    const todayArticles = filterTodayArticles(allArticles);
+    console.log(`Collected ${todayArticles.length} new articles from feeds`);
+
+    // Store the newly collected articles
+    if (todayArticles.length > 0) {
+      await storeArticles(todayArticles);
+      console.log('Articles stored successfully');
+    }
+
+    // Get all articles for today (including any previously collected)
     const articles = await getTodayArticles();
-    console.log(`Found ${articles.length} articles for today`);
+    console.log(`Total articles available for analysis: ${articles.length}`);
 
     if (articles.length === 0) {
       return NextResponse.json(
         {
           error: 'No articles available for analysis',
-          message: 'Please collect articles first using /api/collect',
+          message: 'No articles could be collected from RSS feeds. Please try again later.',
         },
         { status: 400 }
       );

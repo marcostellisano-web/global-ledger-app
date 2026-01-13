@@ -71,7 +71,8 @@ export default async function Home() {
             </div>
 
             <div className="mt-4 text-sm text-slate-500">
-              Articles are automatically collected every 2 hours from Reuters, BBC, AP News, FT, and other sources.
+              Click &quot;Collect Now&quot; to manually gather articles from Reuters, BBC, AP News, FT, and other sources.
+              Articles are also collected automatically during the daily 6pm ET analysis.
             </div>
           </div>
 
